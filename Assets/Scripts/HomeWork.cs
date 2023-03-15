@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -47,6 +49,7 @@ public class HomeWork : MonoBehaviour
         int got = SumEvenNumbersInArray(array);
         string message = want == got ? "Результат верный" : $"Результат не верный, ожидается {want}";
         Debug.Log($"Сумма четных чисел в заданном массиве: {got} - {message}");
+        textField.text = message;
     }
 
     /// <summary>
@@ -65,6 +68,7 @@ public class HomeWork : MonoBehaviour
     /// </summary>
     public void OnFirstOccurrence()
     {
+        StringBuilder sb = new StringBuilder();
         // Первый тест, число присутсвует в массиве
         int[] array = { 81, 22, 13, 34, 10, 34, 15, 26, 71, 68 };
         int value = 34;
@@ -72,6 +76,7 @@ public class HomeWork : MonoBehaviour
         int got = FirstOccurrence(array, value);
         string message = want == got ? "Результат верный" : $"Результат не верный, ожидается {want}";
         Debug.Log($"Индекс первого вхождения числа {value} в массив: {got} - {message}");
+        sb.AppendLine(message);
 
         // Второй тест, число не присутсвует в массиве
         array = new int[] { 81, 22, 13, 34, 10, 34, 15, 26, 71, 68 };
@@ -80,6 +85,8 @@ public class HomeWork : MonoBehaviour
         got = FirstOccurrence(array, value);
         message = want == got ? "Результат верный" : $"Результат не верный, ожидается {want}";
         Debug.Log($"Индекс первого вхождения числа {value} в массив: {got} - {message}");
+        sb.AppendLine(message);
+        textField.text = sb.ToString();
     }
 
     /// <summary>
@@ -90,8 +97,10 @@ public class HomeWork : MonoBehaviour
     /// <returns>Индекс искомого числа в массиве или -1 если число отсуствует</returns>
     private int FirstOccurrence(int[] array, int value)
     {
-        // Реализуйте поиск первого вхождения элемента в массив и верните его индекс,
-        // если елемент не присуствует в массиве верните -1
+        for (int i = 0; i < array.Length; i++)
+        {
+            if (array[i] == value) return i;
+        }
         return -1;
     }
 
@@ -100,15 +109,23 @@ public class HomeWork : MonoBehaviour
     /// </summary>
     public void OnSelectionSort()
     {
+        StringBuilder sb = new StringBuilder();
         int[] originalArray = { 81, 22, 13, 34, 10, 34, 15, 26, 71, 68 };
         Debug.LogFormat("Исходный массив {0}", "[" + string.Join(",", originalArray) + "]");
+        sb.AppendLine($"Исходный массив {string.Join(",", originalArray)}");
 
         int[] sortedArray = SelectionSort((int[])originalArray.Clone());
         Debug.LogFormat("Результат сортировки {0}", "[" + string.Join(",", sortedArray) + "]");
+        sb.AppendLine($"Результат сортировки {string.Join(",", sortedArray)}");
 
         int[] expectedArray = { 10, 13, 15, 22, 26, 34, 34, 68, 71, 81 };
-        Debug.Log(sortedArray.SequenceEqual(expectedArray) ? "Результат верный" : "Результат не верный");
+        var passed = sortedArray.SequenceEqual(expectedArray);
+        Debug.Log(passed ? "Результат верный" : "Результат не верный");
+        sb.AppendLine(passed ? "Результат верный" : "Результат не верный");
+        textField.text = sb.ToString();
     }
+
+    #region UTILITIES
 
     /// <summary>
     /// Метод сортируем массив методом выбора
@@ -117,11 +134,32 @@ public class HomeWork : MonoBehaviour
     /// <returns>Отсортированный массив</returns>
     private int[] SelectionSort(int[] array)
     {
-        // Реализуйте сортировку массива методом выбора и рените результат
+        for (int i = 0; i < array.Length; i++)
+        {
+            int smallestPosition = FindIndexOfLessNumber(array, i);
+            Swap(ref array[i], ref array[smallestPosition]);
+        }
         return array;
     }
 
-    #region UTILITIES
+    private int FindIndexOfLessNumber(int[] array, int startIndex)
+    {
+        var indexOfMinValue = startIndex;
+        for (int i = startIndex; i < array.Length; i++)
+        {
+            if (array[i] < array[indexOfMinValue])
+            {
+                indexOfMinValue = i;
+            }
+        }
+        return indexOfMinValue;
+    }
+
+    private void Swap(ref int a, ref int b)
+    {
+        int c = a;
+        a = b; b = c;
+    }
     private IEnumerable<int> FindEvenNumbers(int min, int max)
     {
         for (int i = min; i < max; i++)
